@@ -9,7 +9,7 @@ import { getTaskTypeIcon } from "@/lib/utils/task-icons";
 import { format } from "date-fns";
 
 export function TaskTable() {
-  const { filteredTasks, completeTask } = useTaskContext();
+  const { tasks, setTasks, completeTask } = useTaskContext();
   const [selectedTask, setSelectedTask] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [sortColumn, setSortColumn] = useState("title");
@@ -38,9 +38,10 @@ export function TaskTable() {
 
   const getAvatarColor = (name) => {
     const colors = {
-      "Jane Smith": "bg-blue-200 text-blue-800",
-      "John Doe": "bg-green-200 text-green-800",
-      "All Team": "bg-red-200 text-red-800",
+      "Karan S": "bg-blue-200 text-blue-800",
+      "Gopichand": "bg-green-200 text-green-800",
+      "Aditiya": "bg-red-200 text-red-800",
+      "Kuenzang Sherub": "bg-blue-200 text-blue-800",
       "Unassigned": "bg-gray-200 text-gray-600"
     };
     
@@ -48,7 +49,7 @@ export function TaskTable() {
   };
 
   const getInitials = (name) => {
-    if (!name || name === "Unassigned") return "?";
+    if (name === "Unassigned") return "?";
     return name
       .split(" ")
       .map((n) => n[0])
@@ -138,7 +139,7 @@ export function TaskTable() {
   return (
     <>
       <DataTable
-        data={filteredTasks}
+        data={tasks}
         columns={columns}
         onRowSelect={handleTaskSelect}
         sortColumn={sortColumn}

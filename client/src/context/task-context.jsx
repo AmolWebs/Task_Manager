@@ -1,6 +1,10 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { getTasks, createTask as createTaskInStorage, completeTask as completeTaskInStorage } from "@shared/schema.js";
+import { 
+  getTasks, 
+  createTask as createTaskFn, 
+  completeTask as completeTaskFn 
+} from "@shared/schema.js";
 
 const TaskContext = createContext(undefined);
 
@@ -14,17 +18,15 @@ export function TaskProvider({ children }) {
     assignedTo: [],
   });
 
-  // Load tasks from localStorage on component mount
+  // Initialize tasks from localStorage
   useEffect(() => {
-    const loadedTasks = getTasks();
-    setTasks(loadedTasks);
+    setTasks(getTasks());
   }, []);
 
-  // Create task function
   const createTask = async (task) => {
     try {
-      const newTask = createTaskInStorage(task);
-      setTasks([...tasks, newTask]);
+      const newTask = createTaskFn(task);
+      setTasks(getTasks());
       toast({
         title: "Success",
         description: "Task created successfully!",
@@ -40,20 +42,15 @@ export function TaskProvider({ children }) {
     }
   };
 
-  // Complete task function
   const completeTask = async (id) => {
     try {
-      const updatedTask = completeTaskInStorage(id);
-      if (updatedTask) {
-        setTasks(tasks.map(task => task.id === id ? updatedTask : task));
-        toast({
-          title: "Success",
-          description: "Task marked as complete!",
-        });
-        return updatedTask;
-      } else {
-        throw new Error("Task not found");
-      }
+      const updatedTask = completeTaskFn(id);
+      setTasks(getTasks());
+      toast({
+        title: "Success",
+        description: "Task marked as complete!",
+      });
+      return updatedTask;
     } catch (error) {
       toast({
         title: "Error",
@@ -135,7 +132,7 @@ export function TaskProvider({ children }) {
         setFilters,
         createTask,
         completeTask,
-        setTasks
+        setTasks,
       }}
     >
       {children}

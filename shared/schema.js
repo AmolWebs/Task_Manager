@@ -1,105 +1,66 @@
-// Define task structure for the application
-const taskSchema = {
-  title: '', // String, required field
-  type: '', // String, required field (e.g., "call", "email", "meeting") 
-  priority: '', // String, required field (e.g., "high", "medium", "low")
-  associatedRecord: null, // String, optional field
-  assignedTo: null, // String, optional field
-  dueDate: null, // Date, required field
-  notes: null, // String, optional field
-  completed: false // Boolean, defaults to false
-};
+// This is a simplified JavaScript version for client-side usage
+// Local storage implementation
 
-// Sample seed data for tasks
-const seedTasks = [
-  {
-    id: 1,
-    title: "Call for Demo schedule",
-    type: "call",
-    priority: "high",
-    associatedRecord: "Acme Inc.",
-    assignedTo: "Jane Smith",
-    dueDate: new Date("2025-03-20T09:00:00"),
-    notes: "Schedule a demo of our new product",
-    completed: false
-  },
-  {
-    id: 2,
-    title: "Send follow-up email",
-    type: "email",
-    priority: "medium",
-    associatedRecord: "TechCorp",
-    assignedTo: "John Doe",
-    dueDate: new Date("2025-03-19T14:00:00"),
-    notes: "Send information about pricing",
-    completed: false
-  },
-  {
-    id: 3,
-    title: "Weekly team meeting",
-    type: "meeting",
-    priority: "medium",
-    associatedRecord: null,
-    assignedTo: "All Team",
-    dueDate: new Date("2025-03-22T10:00:00"),
-    notes: "Review Sprint Progress",
-    completed: false
-  },
-  {
-    id: 4,
-    title: "Prepare presentation",
-    type: "task",
-    priority: "high",
-    associatedRecord: "Board Meeting",
-    assignedTo: "Jane Smith",
-    dueDate: new Date("2025-03-25T09:00:00"),
-    notes: "Prepare Q1 sales presentation",
-    completed: false
-  },
-  {
-    id: 5,
-    title: "Review marketing materials",
-    type: "task",
-    priority: "low",
-    associatedRecord: "Spring Campaign",
-    assignedTo: null,
-    dueDate: new Date("2025-03-28T15:00:00"),
-    notes: "Review copy and visuals for spring campaign",
-    completed: false
-  }
-];
-
-// Helper functions for localStorage
-const localStorageKeys = {
-  TASKS: 'taskManager_tasks',
-  TASK_COUNTER: 'taskManager_taskCounter'
-};
-
-// Initialize localStorage with seed data if empty
+// Initialize local storage with sample tasks if empty
 function initializeLocalStorage() {
-  if (!localStorage.getItem(localStorageKeys.TASKS)) {
-    localStorage.setItem(localStorageKeys.TASKS, JSON.stringify(seedTasks));
-    localStorage.setItem(localStorageKeys.TASK_COUNTER, '6'); // Next ID after seed data
+  if (!localStorage.getItem('tasks')) {
+    const initialTasks = [
+      {
+        id: 1,
+        title: "Call John about project proposal",
+        type: "call",
+        priority: "high",
+        associatedRecord: "Project X",
+        assignedTo: "Alex Smith",
+        dueDate: "2025-03-20",
+        dueTime: "14:00",
+        notes: "Discuss pricing and timeline",
+        completed: false
+      },
+      {
+        id: 2,
+        title: "Send follow-up email to client",
+        type: "email",
+        priority: "medium",
+        associatedRecord: "ABC Corp",
+        assignedTo: "Maria Garcia",
+        dueDate: "2025-03-19",
+        dueTime: "10:30",
+        notes: "Include updated proposal",
+        completed: false
+      },
+      {
+        id: 3,
+        title: "Team meeting for Q2 planning",
+        type: "meeting",
+        priority: "high",
+        associatedRecord: "Internal",
+        assignedTo: "Team",
+        dueDate: "2025-03-22",
+        dueTime: "09:00",
+        notes: "Prepare agenda beforehand",
+        completed: false
+      }
+    ];
+    localStorage.setItem('tasks', JSON.stringify(initialTasks));
   }
 }
 
-// Get all tasks from localStorage
+// Get all tasks from local storage
 function getTasks() {
   initializeLocalStorage();
-  return JSON.parse(localStorage.getItem(localStorageKeys.TASKS) || '[]');
+  return JSON.parse(localStorage.getItem('tasks') || '[]');
 }
 
-// Save tasks to localStorage
+// Save tasks to local storage
 function saveTasks(tasks) {
-  localStorage.setItem(localStorageKeys.TASKS, JSON.stringify(tasks));
+  localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
-// Get next task ID
+// Get the next available task ID
 function getNextTaskId() {
-  initializeLocalStorage();
-  const currentId = parseInt(localStorage.getItem(localStorageKeys.TASK_COUNTER) || '1');
-  localStorage.setItem(localStorageKeys.TASK_COUNTER, (currentId + 1).toString());
-  return currentId;
+  const tasks = getTasks();
+  return tasks.length > 0 ? Math.max(...tasks.map(task => task.id)) + 1 : 1;
 }
 
 // Create a new task
@@ -115,26 +76,25 @@ function createTask(task) {
   return newTask;
 }
 
-// Complete a task
+// Mark a task as completed
 function completeTask(id) {
   const tasks = getTasks();
   const taskIndex = tasks.findIndex(task => task.id === id);
   
   if (taskIndex !== -1) {
-    tasks[taskIndex] = {
-      ...tasks[taskIndex],
-      completed: true
-    };
+    tasks[taskIndex].completed = true;
     saveTasks(tasks);
     return tasks[taskIndex];
   }
   
-  return null;
+  return undefined;
 }
 
 export {
-  taskSchema,
+  initializeLocalStorage,
   getTasks,
+  saveTasks,
+  getNextTaskId,
   createTask,
   completeTask
 };

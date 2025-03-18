@@ -1,4 +1,4 @@
-import { Phone, Mail, CalendarDays, ClipboardCheck } from "lucide-react";
+import { Phone, Mail, CalendarDays } from "lucide-react";
 
 export function getTaskTypeIcon(type) {
   switch (type) {
@@ -8,8 +8,6 @@ export function getTaskTypeIcon(type) {
       return <Mail className="h-4 w-4 text-gray-600" />;
     case "meeting":
       return <CalendarDays className="h-4 w-4 text-gray-600" />;
-    case "task":
-      return <ClipboardCheck className="h-4 w-4 text-gray-600" />;
     default:
       return null;
   }

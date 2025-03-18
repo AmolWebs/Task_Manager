@@ -52,17 +52,16 @@ export function CreateTaskModal({ open, onOpenChange }) {
   const onSubmit = async (values) => {
     setIsSubmitting(true);
     try {
-      // Combine date and time into a single date string
-      const dateTime = new Date(`${values.dueDate}T${values.dueTime}`);
-      
+      // For localStorage, keep date and time as separate strings to simplify filtering
       await createTask({
         title: values.title,
         type: values.type,
         priority: values.priority,
-        associatedRecord: values.associatedRecord || null,
-        assignedTo: values.assignedTo || null,
-        dueDate: dateTime.toISOString(),
-        notes: values.notes || null,
+        associatedRecord: values.associatedRecord || "",
+        assignedTo: values.assignedTo || "",
+        dueDate: values.dueDate,
+        dueTime: values.dueTime,
+        notes: values.notes || "",
       });
       
       form.reset();
@@ -137,12 +136,6 @@ export function CreateTaskModal({ open, onOpenChange }) {
                         </FormControl>
                         <FormLabel className="font-normal">Meeting 📅</FormLabel>
                       </FormItem>
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <RadioGroupItem value="task" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Task ✅</FormLabel>
-                      </FormItem>
                     </RadioGroup>
                   </FormControl>
                   <FormMessage />
@@ -207,10 +200,9 @@ export function CreateTaskModal({ open, onOpenChange }) {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="">None</SelectItem>
-                        <SelectItem value="Acme Inc.">Acme Inc.</SelectItem>
-                        <SelectItem value="TechCorp">TechCorp</SelectItem>
-                        <SelectItem value="Board Meeting">Board Meeting</SelectItem>
-                        <SelectItem value="Spring Campaign">Spring Campaign</SelectItem>
+                        <SelectItem value="Kuenzang Sherub">Kuenzang Sherub</SelectItem>
+                        <SelectItem value="Gopichand">Gopichand</SelectItem>
+                        <SelectItem value="Aditiya">Aditiya</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -235,9 +227,9 @@ export function CreateTaskModal({ open, onOpenChange }) {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="">Unassigned</SelectItem>
-                        <SelectItem value="Jane Smith">Jane Smith</SelectItem>
-                        <SelectItem value="John Doe">John Doe</SelectItem>
-                        <SelectItem value="All Team">All Team</SelectItem>
+                        <SelectItem value="Karan S">Karan S</SelectItem>
+                        <SelectItem value="Gopichand">Gopichand</SelectItem>
+                        <SelectItem value="Aditiya">Aditiya</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

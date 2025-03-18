@@ -8,7 +8,6 @@ export function TaskFilters() {
     { label: "Call", value: "call" },
     { label: "Email", value: "email" },
     { label: "Meeting", value: "meeting" },
-    { label: "Task", value: "task" },
   ];
 
   const priorityOptions = [
@@ -18,9 +17,10 @@ export function TaskFilters() {
   ];
 
   const assignedToOptions = [
-    { label: "Jane Smith", value: "Jane Smith" },
-    { label: "John Doe", value: "John Doe" },
-    { label: "All Team", value: "All Team" },
+    { label: "Karan S", value: "karan" },
+    { label: "Gopichand", value: "gopichand" },
+    { label: "Aditiya", value: "aditiya" },
+    { label: "Kuenzang Sherub", value: "kuenzang" },
     { label: "Unassigned", value: "unassigned" },
   ];
 
@@ -45,7 +45,6 @@ export function TaskFilters() {
 
       <FilterButton
         label="Due Date"
-        count={filters.dueDates.length || undefined}
         options={dueDateOptions}
         selectedValues={filters.dueDates}
         onSelectedChange={(values) =>
@@ -55,7 +54,6 @@ export function TaskFilters() {
 
       <FilterButton
         label="Assigned to"
-        count={filters.assignedTo.length || undefined}
         options={assignedToOptions}
         selectedValues={filters.assignedTo}
         onSelectedChange={(values) =>
@@ -65,7 +63,6 @@ export function TaskFilters() {
 
       <FilterButton
         label="Priority"
-        count={filters.priorities.length || undefined}
         options={priorityOptions}
         selectedValues={filters.priorities}
         onSelectedChange={(values) =>

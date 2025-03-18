@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const createTaskSchema = z.object({
   title: z.string().min(1, "Task name is required"),
-  type: z.enum(["call", "email", "meeting", "task"], {
+  type: z.enum(["call", "email", "meeting"], {
     required_error: "Task type is required",
   }),
   priority: z.enum(["high", "medium", "low"], {
