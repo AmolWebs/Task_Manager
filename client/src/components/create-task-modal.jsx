@@ -41,8 +41,8 @@ export function CreateTaskModal({ open, onOpenChange }) {
       title: "",
       type: "call",
       priority: "medium",
-      associatedRecord: "",
-      assignedTo: "",
+      associatedRecord: "none",
+      assignedTo: "unassigned",
       dueDate: new Date().toISOString().split("T")[0],
       dueTime: "12:00",
       notes: "",
@@ -57,8 +57,8 @@ export function CreateTaskModal({ open, onOpenChange }) {
         title: values.title,
         type: values.type,
         priority: values.priority,
-        associatedRecord: values.associatedRecord || null,
-        assignedTo: values.assignedTo || null,
+        associatedRecord: values.associatedRecord === "none" ? null : values.associatedRecord,
+        assignedTo: values.assignedTo === "unassigned" ? null : values.assignedTo,
         dueDate: values.dueDate,
         dueTime: values.dueTime,
         notes: values.notes || "",
@@ -201,7 +201,7 @@ export function CreateTaskModal({ open, onOpenChange }) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
                         <SelectItem value="Kuenzang Sherub">Kuenzang Sherub</SelectItem>
                         <SelectItem value="Gopichand">Gopichand</SelectItem>
                         <SelectItem value="Aditiya">Aditiya</SelectItem>
@@ -228,7 +228,7 @@ export function CreateTaskModal({ open, onOpenChange }) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">Unassigned</SelectItem>
+                        <SelectItem value="unassigned">Unassigned</SelectItem>
                         <SelectItem value="Karan S">Karan S</SelectItem>
                         <SelectItem value="Gopichand">Gopichand</SelectItem>
                         <SelectItem value="Aditiya">Aditiya</SelectItem>
