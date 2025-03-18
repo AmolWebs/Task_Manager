@@ -28,20 +28,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useTaskContext } from "@/context/task-context";
+import { createTaskSchema } from "@/lib/validators/task";
 import { X } from "lucide-react";
-import { z } from "zod";
-
-// Create a simple validation schema
-const createTaskSchema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
-  type: z.string().min(1, { message: "Task type is required" }),
-  priority: z.string().min(1, { message: "Priority is required" }),
-  associatedRecord: z.string().optional(),
-  assignedTo: z.string().optional(),
-  dueDate: z.string().min(1, { message: "Due date is required" }),
-  dueTime: z.string().min(1, { message: "Due time is required" }),
-  notes: z.string().optional(),
-});
 
 export function CreateTaskModal({ open, onOpenChange }) {
   const { createTask } = useTaskContext();
@@ -64,7 +52,7 @@ export function CreateTaskModal({ open, onOpenChange }) {
   const onSubmit = async (values) => {
     setIsSubmitting(true);
     try {
-      // Combine date and time into a single date object
+      // Combine date and time into a single date string
       const dateTime = new Date(`${values.dueDate}T${values.dueTime}`);
       
       await createTask({
@@ -73,14 +61,12 @@ export function CreateTaskModal({ open, onOpenChange }) {
         priority: values.priority,
         associatedRecord: values.associatedRecord || null,
         assignedTo: values.assignedTo || null,
-        dueDate: dateTime,
+        dueDate: dateTime.toISOString(),
         notes: values.notes || null,
       });
       
       form.reset();
       onOpenChange(false);
-    } catch (error) {
-      console.error("Error creating task:", error);
     } finally {
       setIsSubmitting(false);
     }

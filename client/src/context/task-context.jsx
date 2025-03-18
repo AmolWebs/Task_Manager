@@ -1,14 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { getTasks, createTask as createTaskInStorage, completeTask as completeTaskInStorage } from "../../../shared/schema.js";
+import { getTasks, createTask as createTaskInStorage, completeTask as completeTaskInStorage } from "@shared/schema.js";
 
 const TaskContext = createContext(undefined);
 
 export function TaskProvider({ children }) {
   const { toast } = useToast();
   const [tasks, setTasks] = useState([]);
-  const [refreshKey, setRefreshKey] = useState(0);
-  
   const [filters, setFilters] = useState({
     taskTypes: [],
     priorities: [],
@@ -16,46 +14,38 @@ export function TaskProvider({ children }) {
     assignedTo: [],
   });
 
-  // Load tasks from localStorage
+  // Load tasks from localStorage on component mount
   useEffect(() => {
-    try {
-      const storedTasks = getTasks();
-      setTasks(storedTasks);
-    } catch (error) {
-      console.error("Failed to load tasks from localStorage:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load tasks. Please refresh the page.",
-        variant: "destructive",
-      });
-    }
-  }, [refreshKey]);
+    const loadedTasks = getTasks();
+    setTasks(loadedTasks);
+  }, []);
 
+  // Create task function
   const createTask = async (task) => {
     try {
       const newTask = createTaskInStorage(task);
-      setRefreshKey(prev => prev + 1); // Trigger re-fetch
+      setTasks([...tasks, newTask]);
       toast({
         title: "Success",
         description: "Task created successfully!",
       });
       return newTask;
     } catch (error) {
-      console.error("Failed to create task:", error);
       toast({
         title: "Error",
-        description: "Failed to create task. Please try again.",
+        description: `Failed to create task: ${error.message}`,
         variant: "destructive",
       });
       throw error;
     }
   };
 
+  // Complete task function
   const completeTask = async (id) => {
     try {
       const updatedTask = completeTaskInStorage(id);
       if (updatedTask) {
-        setRefreshKey(prev => prev + 1); // Trigger re-fetch
+        setTasks(tasks.map(task => task.id === id ? updatedTask : task));
         toast({
           title: "Success",
           description: "Task marked as complete!",
@@ -65,10 +55,9 @@ export function TaskProvider({ children }) {
         throw new Error("Task not found");
       }
     } catch (error) {
-      console.error("Failed to complete task:", error);
       toast({
         title: "Error",
-        description: "Failed to complete task. Please try again.",
+        description: `Failed to complete task: ${error.message}`,
         variant: "destructive",
       });
       throw error;
