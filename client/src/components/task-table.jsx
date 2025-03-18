@@ -9,7 +9,7 @@ import { getTaskTypeIcon } from "@/lib/utils/task-icons";
 import { format } from "date-fns";
 
 export function TaskTable() {
-  const { tasks, setTasks, completeTask } = useTaskContext();
+  const { filteredTasks, completeTask } = useTaskContext();
   const [selectedTask, setSelectedTask] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [sortColumn, setSortColumn] = useState("title");
@@ -49,7 +49,7 @@ export function TaskTable() {
   };
 
   const getInitials = (name) => {
-    if (name === "Unassigned") return "?";
+    if (!name || name === "Unassigned") return "?";
     return name
       .split(" ")
       .map((n) => n[0])
@@ -63,6 +63,27 @@ export function TaskTable() {
       low: "bg-slate-500"
     };
     return colors[priority] || "bg-slate-500";
+  };
+
+  // Format the date and time for display
+  const formatDateTime = (dateStr, timeStr) => {
+    if (!dateStr) return '';
+    
+    try {
+      // If we have both date and time strings (localStorage format)
+      if (timeStr) {
+        const [year, month, day] = dateStr.split('-');
+        const [hours, minutes] = timeStr.split(':');
+        const date = new Date(year, month - 1, day, hours, minutes);
+        return format(date, "d MMM, yyyy, h:mma");
+      } 
+      // If we have a full ISO string (API format)
+      else {
+        return format(new Date(dateStr), "d MMM, yyyy, h:mma");
+      }
+    } catch (error) {
+      return dateStr;
+    }
   };
 
   const columns = [
@@ -98,7 +119,7 @@ export function TaskTable() {
       sortable: true,
       cell: (task) => (
         <span className="text-sm text-gray-700">
-          {format(new Date(task.dueDate), "d MMM, yyyy, h:mma")}
+          {formatDateTime(task.dueDate, task.dueTime)}
         </span>
       ),
     },
@@ -134,12 +155,33 @@ export function TaskTable() {
         )
       ),
     },
+    {
+      id: "actions",
+      header: "",
+      sortable: false,
+      cell: (task) => (
+        <div className="text-right">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="p-1 hover:bg-gray-100 rounded-md">
+                <MoreVertical className="h-4 w-4 text-gray-500" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleTaskSelect(task)}>
+                Complete Task
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      ),
+    },
   ];
 
   return (
     <>
       <DataTable
-        data={tasks}
+        data={filteredTasks}
         columns={columns}
         onRowSelect={handleTaskSelect}
         sortColumn={sortColumn}
