@@ -17,7 +17,7 @@ export function TopBar() {
             <Avatar className="w-8 h-8 bg-primary text-white">
               <AvatarFallback className="text-sm font-semibold">JD</AvatarFallback>
             </Avatar>
-            <span className="ml-2 text-sm font-medium">John Doe</span>
+            <span className="ml-2 text-sm font-medium">John Dew</span>
           </div>
         </div>
       </div>
