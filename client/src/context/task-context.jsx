@@ -1,16 +1,17 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  getTasks, 
-  createTask as createTaskFn, 
-  completeTask as completeTaskFn 
-} from "@shared/schema.js";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { getTasks, createTask as createLocalTask, completeTask as completeLocalTask } from "@shared/schema.js";
 
 const TaskContext = createContext(undefined);
 
 export function TaskProvider({ children }) {
   const { toast } = useToast();
+  
+  // Use local state for tasks instead of React Query when using localStorage
   const [tasks, setTasks] = useState([]);
+  
   const [filters, setFilters] = useState({
     taskTypes: [],
     priorities: [],
@@ -18,15 +19,16 @@ export function TaskProvider({ children }) {
     assignedTo: [],
   });
 
-  // Initialize tasks from localStorage
+  // Load tasks from localStorage on component mount
   useEffect(() => {
-    setTasks(getTasks());
+    const loadedTasks = getTasks();
+    setTasks(loadedTasks);
   }, []);
 
   const createTask = async (task) => {
     try {
-      const newTask = createTaskFn(task);
-      setTasks(getTasks());
+      const newTask = createLocalTask(task);
+      setTasks(prev => [...prev, newTask]);
       toast({
         title: "Success",
         description: "Task created successfully!",
@@ -44,13 +46,17 @@ export function TaskProvider({ children }) {
 
   const completeTask = async (id) => {
     try {
-      const updatedTask = completeTaskFn(id);
-      setTasks(getTasks());
-      toast({
-        title: "Success",
-        description: "Task marked as complete!",
-      });
-      return updatedTask;
+      const updatedTask = completeLocalTask(id);
+      if (updatedTask) {
+        setTasks(prev => prev.map(task => task.id === id ? updatedTask : task));
+        toast({
+          title: "Success",
+          description: "Task marked as complete!",
+        });
+        return updatedTask;
+      } else {
+        throw new Error("Task not found");
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -63,6 +69,11 @@ export function TaskProvider({ children }) {
 
   // Apply filters
   const filteredTasks = tasks.filter((task) => {
+    // Only show non-completed tasks
+    if (task.completed) {
+      return false;
+    }
+    
     // Filter by task type
     if (filters.taskTypes.length > 0 && !filters.taskTypes.includes(task.type)) {
       return false;
@@ -75,14 +86,11 @@ export function TaskProvider({ children }) {
 
     // Filter by assigned to
     if (filters.assignedTo.length > 0) {
-      if (filters.assignedTo.includes("unassigned") && task.assignedTo) {
+      if (filters.assignedTo.includes("Unassigned") && task.assignedTo) {
         return false;
       } else if (
-        !filters.assignedTo.includes("unassigned") && 
-        !task.assignedTo || 
-        !filters.assignedTo.some(assignee => 
-          task.assignedTo?.toLowerCase().includes(assignee.toLowerCase())
-        )
+        !filters.assignedTo.includes("Unassigned") && 
+        (!task.assignedTo || !filters.assignedTo.includes(task.assignedTo))
       ) {
         return false;
       }
@@ -102,7 +110,20 @@ export function TaskProvider({ children }) {
       const nextWeekEnd = new Date(nextWeekStart);
       nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
       
-      const taskDate = new Date(task.dueDate);
+      let taskDate;
+      
+      // Handle different date formats
+      if (typeof task.dueDate === 'string' && task.dueDate.includes('T')) {
+        // ISO format
+        taskDate = new Date(task.dueDate);
+      } else if (typeof task.dueDate === 'string' && task.dueDate.includes('-')) {
+        // YYYY-MM-DD format (from localStorage)
+        const [year, month, day] = task.dueDate.split('-');
+        taskDate = new Date(year, month - 1, day);
+      } else {
+        // Fallback
+        taskDate = new Date(task.dueDate);
+      }
       
       const isToday = taskDate.toDateString() === today.toDateString();
       const isTomorrow = taskDate.toDateString() === tomorrow.toDateString();

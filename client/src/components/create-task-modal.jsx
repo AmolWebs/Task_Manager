@@ -52,13 +52,13 @@ export function CreateTaskModal({ open, onOpenChange }) {
   const onSubmit = async (values) => {
     setIsSubmitting(true);
     try {
-      // For localStorage, keep date and time as separate strings to simplify filtering
+      // For localStorage implementation, we keep the date and time separate
       await createTask({
         title: values.title,
         type: values.type,
         priority: values.priority,
-        associatedRecord: values.associatedRecord || "",
-        assignedTo: values.assignedTo || "",
+        associatedRecord: values.associatedRecord || null,
+        assignedTo: values.assignedTo || null,
         dueDate: values.dueDate,
         dueTime: values.dueTime,
         notes: values.notes || "",
@@ -66,6 +66,8 @@ export function CreateTaskModal({ open, onOpenChange }) {
       
       form.reset();
       onOpenChange(false);
+    } catch (error) {
+      console.error("Failed to create task:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -230,6 +232,7 @@ export function CreateTaskModal({ open, onOpenChange }) {
                         <SelectItem value="Karan S">Karan S</SelectItem>
                         <SelectItem value="Gopichand">Gopichand</SelectItem>
                         <SelectItem value="Aditiya">Aditiya</SelectItem>
+                        <SelectItem value="Kuenzang Sherub">Kuenzang Sherub</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
